@@ -153,6 +153,11 @@ class AI_Product_Recommendation_Plugin {
         <?php
     }
 
+    /**
+     * Shortcode callback to display product recommendations.
+     *
+     * @return string HTML output.
+     */
 
     public function shortcode_callback() {
         $options = get_option( $this->option_name );
@@ -171,6 +176,13 @@ class AI_Product_Recommendation_Plugin {
             }
         }
 
+
+        if ( empty( $prompt ) ) {
+            $prompt = __( 'Recommend {count} products for a user interested in {preferences}. Return only product names separated by commas.', 'ai-prp' );
+        }
+
+        $prompt = str_replace( array( '{count}', '{preferences}' ), array( $count, $preferences ), $prompt );
+
         $recommendations = $this->fetch_recommendations( $prompt, isset( $options['api_key'] ) ? $options['api_key'] : '' );
         if ( is_wp_error( $recommendations ) ) {
             return '';
@@ -180,12 +192,16 @@ class AI_Product_Recommendation_Plugin {
         $output = '<ul class="ai-prp-list">';
         foreach ( $items as $item ) {
 
+            if ( '' !== $item ) {
+
+
             $product = get_page_by_title( $item, OBJECT, 'product' );
             if ( $product ) {
                 $output .= '<li><a href="' . esc_url( get_permalink( $product ) ) . '">' . esc_html( get_the_title( $product ) ) . '</a></li>';
             } else {
 
             if ( '' !== $item ) {
+
 
                 $output .= '<li>' . esc_html( $item ) . '</li>';
             }
