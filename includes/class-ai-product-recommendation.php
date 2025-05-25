@@ -55,6 +55,7 @@ class AI_Product_Recommendation_Plugin {
 
     /**
      * Add settings page under the WooCommerce menu.
+     * (If you want to keep it under Settings menu, replace 'woocommerce' with 'options-general.php')
      */
     public function add_settings_page() {
         add_submenu_page(
@@ -191,18 +192,25 @@ class AI_Product_Recommendation_Plugin {
             if ( '' === $item ) {
                 continue;
             }
-
-            $products = wc_get_products(
-                array(
-                    'status' => 'publish',
-                    'limit'  => 1,
-                    'search' => $item,
-                )
-            );
-
-            if ( ! empty( $products ) ) {
-                $product = $products[0];
-                $output .= '<li><a href="' . esc_url( get_permalink( $product->get_id() ) ) . '">' . esc_html( $product->get_name() ) . '</a></li>';
+            // Combine both methods, prioritize WooCommerce if available:
+            if ( function_exists( 'wc_get_products' ) ) {
+                $products = wc_get_products(
+                    array(
+                        'status' => 'publish',
+                        'limit'  => 1,
+                        'search' => $item,
+                    )
+                );
+                if ( ! empty( $products ) ) {
+                    $product = $products[0];
+                    $output .= '<li><a href="' . esc_url( get_permalink( $product->get_id() ) ) . '">' . esc_html( $product->get_name() ) . '</a></li>';
+                    continue;
+                }
+            }
+            // Fallback for standard product post type
+            $product = get_page_by_title( $item, OBJECT, 'product' );
+            if ( $product ) {
+                $output .= '<li><a href="' . esc_url( get_permalink( $product ) ) . '">' . esc_html( get_the_title( $product ) ) . '</a></li>';
             } else {
                 $output .= '<li>' . esc_html( $item ) . '</li>';
             }
