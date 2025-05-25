@@ -119,6 +119,8 @@ class AI_Product_Recommendation_Plugin {
         $options = get_option( $this->option_name );
         ?>
         <textarea name="<?php echo esc_attr( $this->option_name ); ?>[prompt]" rows="5" cols="50" class="large-text"><?php echo isset( $options['prompt'] ) ? esc_textarea( $options['prompt'] ) : ''; ?></textarea>
+        <p class="description"><?php esc_html_e( 'Use {preferences} and {count} placeholders.', 'ai-prp' ); ?></p>
+
 
         <p class="description"><?php esc_html_e( 'Use {preferences}, {count}, and {products} placeholders.', 'ai-prp' ); ?></p>
 
