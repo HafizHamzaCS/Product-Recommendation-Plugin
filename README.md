@@ -1,17 +1,20 @@
-# Product Recommendation Plugin
+# AI Product Recommendation Plugin
 
-This plugin provides a minimal product recommendation system.
+This plugin provides an MVP product recommendation system powered by OpenAI's ChatGPT API.
 
 ## Features
 
-- Registers a custom post type **Product**.
-- Adds meta boxes for **Product Name** and **Product Category** fields.
-- Shortcode `[product_recommendations category="CATEGORY"]` displays products matching the category.
+- Shortcode `[ai_product_recommendations]` generates personalized product suggestions.
+- Settings page to configure the OpenAI API key, prompt template, and number of products to display.
+- Recommendations are displayed in a responsive list.
+- Requires WooCommerce to be installed and active.
 
 ## Usage
 
-1. Copy `product-recommendation-plugin.php` to your WordPress plugin directory.
-2. Activate the plugin from the WordPress admin.
-3. Add products using the **Products** menu.
-4. Use the shortcode in posts or pages to display recommendations by category.
+1. Copy the plugin files to your WordPress `wp-content/plugins` directory.
+2. Activate **AI Product Recommendation Plugin** from the admin Plugins screen.
+3. Visit **Settings > AI Recommendations** to enter your API key and customize the prompt.
+4. Insert the shortcode into any post or page.
+5. A **Settings** link is available on the Plugins page for quick access.
 
+The prompt template supports `{preferences}` and `{count}` placeholders which will be replaced with user preference data and the number of products to show.
