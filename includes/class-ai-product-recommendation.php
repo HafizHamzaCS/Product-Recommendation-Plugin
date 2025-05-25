@@ -1,6 +1,6 @@
 <?php
 /**
- * Main plugin class for AI Product Recommendation Plugin.
+ * Main plugin class for AI WooCommerce Product Recommendation Plugin.
  *
  * @package AI_PRP
  */
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * AI Product Recommendation Plugin class.
+ * Main class for the AI WooCommerce Product Recommendation plugin.
  */
 class AI_Product_Recommendation_Plugin {
 
@@ -54,10 +54,12 @@ class AI_Product_Recommendation_Plugin {
     }
 
     /**
-     * Add settings page under the Settings menu.
+     * Add settings page under the WooCommerce menu.
+     * (If you want to keep it under Settings menu, replace 'woocommerce' with 'options-general.php')
      */
     public function add_settings_page() {
-        add_options_page(
+        add_submenu_page(
+            'woocommerce',
             __( 'AI Recommendations', 'ai-prp' ),
             __( 'AI Recommendations', 'ai-prp' ),
             'manage_options',
@@ -120,10 +122,6 @@ class AI_Product_Recommendation_Plugin {
         ?>
         <textarea name="<?php echo esc_attr( $this->option_name ); ?>[prompt]" rows="5" cols="50" class="large-text"><?php echo isset( $options['prompt'] ) ? esc_textarea( $options['prompt'] ) : ''; ?></textarea>
         <p class="description"><?php esc_html_e( 'Use {preferences} and {count} placeholders.', 'ai-prp' ); ?></p>
-
-
-        <p class="description"><?php esc_html_e( 'Use {preferences}, {count}, and {products} placeholders.', 'ai-prp' ); ?></p>
-
         <?php
     }
 
@@ -160,7 +158,6 @@ class AI_Product_Recommendation_Plugin {
      *
      * @return string HTML output.
      */
-
     public function shortcode_callback() {
         $options = get_option( $this->option_name );
         $count   = isset( $options['count'] ) ? absint( $options['count'] ) : 3;
@@ -178,7 +175,6 @@ class AI_Product_Recommendation_Plugin {
             }
         }
 
-
         if ( empty( $prompt ) ) {
             $prompt = __( 'Recommend {count} products for a user interested in {preferences}. Return only product names separated by commas.', 'ai-prp' );
         }
@@ -193,18 +189,29 @@ class AI_Product_Recommendation_Plugin {
         $items  = array_map( 'trim', explode( ',', $recommendations ) );
         $output = '<ul class="ai-prp-list">';
         foreach ( $items as $item ) {
-
-            if ( '' !== $item ) {
-
-
+            if ( '' === $item ) {
+                continue;
+            }
+            // Combine both methods, prioritize WooCommerce if available:
+            if ( function_exists( 'wc_get_products' ) ) {
+                $products = wc_get_products(
+                    array(
+                        'status' => 'publish',
+                        'limit'  => 1,
+                        'search' => $item,
+                    )
+                );
+                if ( ! empty( $products ) ) {
+                    $product = $products[0];
+                    $output .= '<li><a href="' . esc_url( get_permalink( $product->get_id() ) ) . '">' . esc_html( $product->get_name() ) . '</a></li>';
+                    continue;
+                }
+            }
+            // Fallback for standard product post type
             $product = get_page_by_title( $item, OBJECT, 'product' );
             if ( $product ) {
                 $output .= '<li><a href="' . esc_url( get_permalink( $product ) ) . '">' . esc_html( get_the_title( $product ) ) . '</a></li>';
             } else {
-
-            if ( '' !== $item ) {
-
-
                 $output .= '<li>' . esc_html( $item ) . '</li>';
             }
         }
