@@ -1,6 +1,7 @@
 <?php
 /**
  * Plugin Name: AI Product Recommendation Plugin
+
  * Description: MVP product recommendation system using ChatGPT. Provides a shortcode for displaying recommendations.
  * Version: 1.0.0
  * Author: OpenAI Codex
@@ -39,3 +40,11 @@ function ai_prp_init() {
     new AI_Product_Recommendation_Plugin();
 }
 add_action( 'plugins_loaded', 'ai_prp_init' );
+
+
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly.
+}
+
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-ai-product-recommendation.php';

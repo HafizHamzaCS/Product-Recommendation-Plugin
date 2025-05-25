@@ -119,7 +119,9 @@ class AI_Product_Recommendation_Plugin {
         $options = get_option( $this->option_name );
         ?>
         <textarea name="<?php echo esc_attr( $this->option_name ); ?>[prompt]" rows="5" cols="50" class="large-text"><?php echo isset( $options['prompt'] ) ? esc_textarea( $options['prompt'] ) : ''; ?></textarea>
-        <p class="description"><?php esc_html_e( 'Use {preferences} and {count} placeholders.', 'ai-prp' ); ?></p>
+
+        <p class="description"><?php esc_html_e( 'Use {preferences}, {count}, and {products} placeholders.', 'ai-prp' ); ?></p>
+
         <?php
     }
 
@@ -156,6 +158,7 @@ class AI_Product_Recommendation_Plugin {
      *
      * @return string HTML output.
      */
+
     public function shortcode_callback() {
         $options = get_option( $this->option_name );
         $count   = isset( $options['count'] ) ? absint( $options['count'] ) : 3;
@@ -173,6 +176,7 @@ class AI_Product_Recommendation_Plugin {
             }
         }
 
+
         if ( empty( $prompt ) ) {
             $prompt = __( 'Recommend {count} products for a user interested in {preferences}. Return only product names separated by commas.', 'ai-prp' );
         }
@@ -187,7 +191,18 @@ class AI_Product_Recommendation_Plugin {
         $items  = array_map( 'trim', explode( ',', $recommendations ) );
         $output = '<ul class="ai-prp-list">';
         foreach ( $items as $item ) {
+
             if ( '' !== $item ) {
+
+
+            $product = get_page_by_title( $item, OBJECT, 'product' );
+            if ( $product ) {
+                $output .= '<li><a href="' . esc_url( get_permalink( $product ) ) . '">' . esc_html( get_the_title( $product ) ) . '</a></li>';
+            } else {
+
+            if ( '' !== $item ) {
+
+
                 $output .= '<li>' . esc_html( $item ) . '</li>';
             }
         }
